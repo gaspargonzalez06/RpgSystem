@@ -19,7 +19,7 @@ class ProveedorMovimientoProvider with ChangeNotifier {
   // Obtener todos los proveedores del servidor
 Future<void> fetchProveedores() async {
   try {
-    final response = await http.get(Uri.parse('http://localhost:3000/proveedores'));
+    final response = await http.get(Uri.parse('http://localhost:3002/proveedores'));
 
     if (response.statusCode == 200) {
       final List<dynamic> data = json.decode(response.body);
@@ -37,31 +37,31 @@ Future<void> fetchProveedores() async {
     notifyListeners();
   }
 }
+List<MovimientosPorUsuario> get movimientosPorUsuario => _movimientosPorUsuario;
 
-  // Obtener movimientos contables por Id de proyecto
-  Future<void> fetchMovimientosPorProyecto(int idProyecto) async {
-    try {
-      final response = await http.post(
-        Uri.parse('http://localhost:3000/movimientosProyecto'),
-        headers: {'Content-Type': 'application/json'},
-        body: json.encode({'idProyecto': idProyecto}),
-      );
+List<MovimientosPorUsuario> _movimientosPorUsuario = [];
 
-      if (response.statusCode == 200) {
-        final List<dynamic> data = json.decode(response.body);
+Future<void> fetchMovimientos() async {
+  try {
+    final response = await http.get(Uri.parse('http://localhost:3002/movimientosUsuario'));
 
-        _movimientos = data.map((item) => MovimientoContable.fromJson(item)).toList();
-        _errorMessage = null;
-        notifyListeners();
-      } else {
-        _errorMessage = 'Error: ${response.statusCode}';
-        notifyListeners();
-      }
-    } catch (e) {
-      _errorMessage = 'Error al hacer la solicitud HTTP: $e';
-      notifyListeners();
+    if (response.statusCode == 200) {
+      final List<dynamic> data = json.decode(response.body);
+      _movimientosPorUsuario = data
+          .map((item) => MovimientosPorUsuario.fromJson(item))
+          .toList();
+      _errorMessage = null;
+    } else {
+      _errorMessage = 'Error ${response.statusCode}: ${response.reasonPhrase}';
     }
+  } catch (e) {
+    _errorMessage = 'Error al hacer la solicitud HTTP: $e';
   }
+
+  notifyListeners();
+}
+
+
 
 Future<void> agregarMovimientoContable({
   required int idCliente,
@@ -74,7 +74,7 @@ Future<void> agregarMovimientoContable({
   int? idTrabajador,
   int? idProveedor,
 }) async {
-  final url = Uri.parse('http://localhost:3000/crear_movimiento');
+  final url = Uri.parse('http://localhost:3002/crear_movimiento');
 
   final Map<String, dynamic> body = {
     'Id_Ciente': idCliente,

@@ -3,7 +3,7 @@ const mysql = require('mysql2');
 const cors = require('cors');
 
 const app = express();
-const PORT = 3000;
+const PORT = 3002;
 
 app.use(cors());
 app.use(express.json());
@@ -76,6 +76,58 @@ app.get('/proveedores', (req, res) => {
     res.json(rows);
   });
 });
+
+app.get('/movimientosUsuario', (req, res) => {
+  const query = `
+    SELECT 
+      us.Id_Usuario_Sistema,
+      us.Nombre_Usuario,
+      us.Id_Tipo_Usuario,
+      mc.*
+    FROM movimientos_contables mc
+    JOIN usuarios_sistema us 
+      ON us.Id_Usuario_Sistema = COALESCE(mc.Id_Trabajador, mc.Id_Proveedor)
+    ORDER BY us.Id_Usuario_Sistema;
+  `;
+
+  db.query(query, (err, rows) => {
+    if (err) {
+      console.error('Error al ejecutar la consulta:', err);
+      return res.status(500).json({ error: 'Error en el servidor', details: err });
+    }
+
+    const agrupado = {};
+
+    // Agrupar movimientos por Id_Usuario_Sistema
+    rows.forEach((row) => {
+      const userId = row.Id_Usuario_Sistema;
+
+      if (!agrupado[userId]) {
+        agrupado[userId] = {
+          usuario: {
+            Id_Usuario_Sistema: row.Id_Usuario_Sistema,
+            Nombre_Usuario: row.Nombre_Usuario,
+            Id_Tipo_Usuario : row.Id_Tipo_Usuario
+          },
+          movimientos: []
+        };
+      }
+
+      // Excluir los campos de usuario duplicados en los movimientos
+      const movimiento = { ...row };
+      delete movimiento.Id_Usuario_Sistema;
+      delete movimiento.Nombre_Usuario;
+
+      agrupado[userId].movimientos.push(movimiento);
+    });
+
+    // Convertir el objeto agrupado en array
+    const resultado = Object.values(agrupado);
+
+    res.json(resultado);
+  });
+});
+
 
 app.get('/movimientosProyecto', (req, res) => {
   const idProyecto = req.query.idProyecto;
@@ -178,6 +230,6 @@ app.post('/crear_movimiento', (req, res) => {
 
 
 // Iniciar servidor
-app.listen(PORT, () => {
+app.listen(PORT,'0.0.0.0', () => {
   console.log(`Servidor corriendo en http://localhost:${PORT}`);
 });

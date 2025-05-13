@@ -5,6 +5,7 @@ import 'package:rpg_accounts/Drawer/AppDrawer.dart';
 import 'package:rpg_accounts/Models/ProyectosModel.dart';
 import 'package:rpg_accounts/Provider/ProyectosProvider.dart';
 import 'package:rpg_accounts/Views/Proyectos/DetallesDeEmpresa.dart';
+import 'package:rpg_accounts/Views/Proyectos/ProyectosDetailsScreen.dart';
 import 'package:rpg_accounts/Views/Proyectos/TablaCobros.dart';
 import 'package:rpg_accounts/Views/ProyectosParteSuperior.dart';
 import 'package:rpg_accounts/main.dart';
@@ -252,7 +253,7 @@ class ProjectCard extends StatelessWidget {
       onTap: () {
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (_) => ProjectDetailsScreen(idProyecto:project.id_proyecto)),
+          MaterialPageRoute(builder: (_) => MovimientosPorProyectoScreen(idProyecto:project.id_proyecto)),
         );
       },child: Card(
   shape: RoundedRectangleBorder(
@@ -302,7 +303,7 @@ class ProjectCard extends StatelessWidget {
           onPressed: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (_) => ProjectDetailsScreen(idProyecto:project.id_proyecto)),
+              MaterialPageRoute(builder: (_) => MovimientosPorProyectoScreen(idProyecto:project.id_proyecto)),
             );
           },
           style: ElevatedButton.styleFrom(
@@ -335,355 +336,355 @@ class Servicio {
     this.proveedor = '',
   });
 }  
-class ProjectDetailsScreen extends StatefulWidget {
+// class ProjectDetailsScreen extends StatefulWidget {
 
-    final int idProyecto;
+//     final int idProyecto;
 
-  // Constructor para recibir el ID del proyecto
-  ProjectDetailsScreen({required this.idProyecto});
-  @override
-  State<ProjectDetailsScreen> createState() => _ProjectDetailsScreenState();
-}
+//   // Constructor para recibir el ID del proyecto
+//   ProjectDetailsScreen({required this.idProyecto});
+//   @override
+//   State<ProjectDetailsScreen> createState() => _ProjectDetailsScreenState();
+// }
 
-class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
-  late Proyecto project;
+// class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
+//   late Proyecto project;
 
-  @override
-  void initState() {
-    super.initState();
-    // Llamar al provider para obtener los proyectos
-    _loadProject();
-  }
+//   @override
+//   void initState() {
+//     super.initState();
+//     // Llamar al provider para obtener los proyectos
+//     _loadProject();
+//   }
 
-  // Función para cargar el proyecto desde el provider
-  void _loadProject() {
-    final projectProvider = Provider.of<ProyectoProvider>(context, listen: false);
+//   // Función para cargar el proyecto desde el provider
+//   void _loadProject() {
+//     final projectProvider = Provider.of<ProyectoProvider>(context, listen: false);
     
-    // Obtener el proyecto por id
-    Proyecto foundProject = projectProvider.getProjectById(widget.idProyecto);
+//     // Obtener el proyecto por id
+//     Proyecto foundProject = projectProvider.getProjectById(widget.idProyecto);
 
-    // Establecer el proyecto en el estado local
-    setState(() {
-      project = foundProject;
-    });
-  }
+//     // Establecer el proyecto en el estado local
+//     setState(() {
+//       project = foundProject;
+//     });
+//   }
 
-_abrirDialogoMovimiento(BuildContext context) {
-    List<Servicio> serviciosDisponibles = [
-      Servicio(nombre: 'Electricidad'),
-      Servicio(nombre: 'Fontanería'),
-      Servicio(nombre: 'Carpintería'),
-      Servicio(nombre: 'Pintura'),
-    ];
+// _abrirDialogoMovimiento(BuildContext context) {
+//     List<Servicio> serviciosDisponibles = [
+//       Servicio(nombre: 'Electricidad'),
+//       Servicio(nombre: 'Fontanería'),
+//       Servicio(nombre: 'Carpintería'),
+//       Servicio(nombre: 'Pintura'),
+//     ];
 
-    List<String> proveedores = ['Ferretería Central', 'Suministros JR', 'Proveedor 3'];
+//     List<String> proveedores = ['Ferretería Central', 'Suministros JR', 'Proveedor 3'];
 
-    List<Servicio> serviciosSeleccionados = [];
-    String categoria = 'Pago';
-    String tipoOrigen = 'Proveedor';
-    String nombreOrigen = '';
+//     List<Servicio> serviciosSeleccionados = [];
+//     String categoria = 'Pago';
+//     String tipoOrigen = 'Proveedor';
+//     String nombreOrigen = '';
 
-    showDialog(
-      context: context,
-      builder: (context) {
-        return StatefulBuilder(
-          builder: (context, setStateDialog) {
-            double total = serviciosSeleccionados.fold(
-              0,
-              (sum, s) => sum + s.monto,
-            );
+//     showDialog(
+//       context: context,
+//       builder: (context) {
+//         return StatefulBuilder(
+//           builder: (context, setStateDialog) {
+//             double total = serviciosSeleccionados.fold(
+//               0,
+//               (sum, s) => sum + s.monto,
+//             );
 
-            List<String> opcionesNombre = ['Proveedor', 'Tienda', 'Personal']
-                .contains(tipoOrigen)
-                ? ['Ferretería Central', 'Suministros JR', 'Proveedor 3']
-                : [];
+//             List<String> opcionesNombre = ['Proveedor', 'Tienda', 'Personal']
+//                 .contains(tipoOrigen)
+//                 ? ['Ferretería Central', 'Suministros JR', 'Proveedor 3']
+//                 : [];
 
-            return AlertDialog(
-              title: Text('Agregar Movimiento'),
-              content: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    ElevatedButton.icon(
-                      onPressed: () async {
-                        final seleccionados =
-                            await showModalBottomSheet<List<Servicio>>(
-                          context: context,
-                          isScrollControlled: true,
-                          builder: (context) {
-                            List<Servicio> seleccionTemp =
-                                List.from(serviciosDisponibles);
+//             return AlertDialog(
+//               title: Text('Agregar Movimiento'),
+//               content: SingleChildScrollView(
+//                 child: Column(
+//                   crossAxisAlignment: CrossAxisAlignment.start,
+//                   children: [
+//                     ElevatedButton.icon(
+//                       onPressed: () async {
+//                         final seleccionados =
+//                             await showModalBottomSheet<List<Servicio>>(
+//                           context: context,
+//                           isScrollControlled: true,
+//                           builder: (context) {
+//                             List<Servicio> seleccionTemp =
+//                                 List.from(serviciosDisponibles);
 
-                            return StatefulBuilder(
-                              builder: (context, setStateModal) {
-                                return Padding(
-                                  padding: const EdgeInsets.all(16.0),
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Text("Seleccionar Servicios",
-                                          style: TextStyle(
-                                              fontSize: 18,
-                                              fontWeight: FontWeight.bold)),
-                                      SizedBox(height: 10),
-                                      ...seleccionTemp.map((s) {
-                                        return CheckboxListTile(
-                                          title: Text(s.nombre),
-                                          value: s.seleccionado,
-                                          onChanged: (bool? value) {
-                                            setStateModal(() {
-                                              s.seleccionado = value ?? false;
-                                            });
-                                          },
-                                        );
-                                      }).toList(),
-                                      SizedBox(height: 20),
-                                      ElevatedButton(
-                                        onPressed: () {
-                                          Navigator.pop(
-                                            context,
-                                            seleccionTemp
-                                                .where((s) => s.seleccionado)
-                                                .toList(),
-                                          );
-                                        },
-                                        child: Text("Agregar"),
-                                      )
-                                    ],
-                                  ),
-                                );
-                              },
-                            );
-                          },
-                        );
+//                             return StatefulBuilder(
+//                               builder: (context, setStateModal) {
+//                                 return Padding(
+//                                   padding: const EdgeInsets.all(16.0),
+//                                   child: Column(
+//                                     mainAxisSize: MainAxisSize.min,
+//                                     children: [
+//                                       Text("Seleccionar Servicios",
+//                                           style: TextStyle(
+//                                               fontSize: 18,
+//                                               fontWeight: FontWeight.bold)),
+//                                       SizedBox(height: 10),
+//                                       ...seleccionTemp.map((s) {
+//                                         return CheckboxListTile(
+//                                           title: Text(s.nombre),
+//                                           value: s.seleccionado,
+//                                           onChanged: (bool? value) {
+//                                             setStateModal(() {
+//                                               s.seleccionado = value ?? false;
+//                                             });
+//                                           },
+//                                         );
+//                                       }).toList(),
+//                                       SizedBox(height: 20),
+//                                       ElevatedButton(
+//                                         onPressed: () {
+//                                           Navigator.pop(
+//                                             context,
+//                                             seleccionTemp
+//                                                 .where((s) => s.seleccionado)
+//                                                 .toList(),
+//                                           );
+//                                         },
+//                                         child: Text("Agregar"),
+//                                       )
+//                                     ],
+//                                   ),
+//                                 );
+//                               },
+//                             );
+//                           },
+//                         );
 
-                        if (seleccionados != null) {
-                          setStateDialog(() {
-                            serviciosSeleccionados = seleccionados;
-                          });
-                        }
-                      },
-                      icon: Icon(Icons.add),
-                      label: Text('Seleccionar Servicios'),
-                    ),
+//                         if (seleccionados != null) {
+//                           setStateDialog(() {
+//                             serviciosSeleccionados = seleccionados;
+//                           });
+//                         }
+//                       },
+//                       icon: Icon(Icons.add),
+//                       label: Text('Seleccionar Servicios'),
+//                     ),
 
-                    SizedBox(height: 10),
+//                     SizedBox(height: 10),
 
-                    ...serviciosSeleccionados.map((s) {
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 8.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(s.nombre, style: TextStyle(fontWeight: FontWeight.bold)),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: TextFormField(
-                                    initialValue:
-                                        s.monto > 0 ? s.monto.toString() : '',
-                                    keyboardType: TextInputType.number,
-                                    decoration: InputDecoration(
-                                      labelText: 'Monto',
-                                      border: OutlineInputBorder(),
-                                    ),
-                                    onChanged: (val) {
-                                      setStateDialog(() {
-                                        s.monto = double.tryParse(val) ?? 0;
-                                      });
-                                    },
-                                  ),
-                                ),
-                                SizedBox(width: 10),
-                                Expanded(
-                                  child: DropdownButtonFormField<String>(
-                                    value: s.proveedor.isNotEmpty
-                                        ? s.proveedor
-                                        : null,
-                                    hint: Text("Proveedor"),
-                                    items: proveedores
-                                        .map((p) => DropdownMenuItem(
-                                              value: p,
-                                              child: Text(p),
-                                            ))
-                                        .toList(),
-                                    onChanged: (value) {
-                                      setStateDialog(() {
-                                        s.proveedor = value ?? '';
-                                      });
-                                    },
-                                    decoration: InputDecoration(
-                                      border: OutlineInputBorder(),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      );
-                    }).toList(),
+//                     ...serviciosSeleccionados.map((s) {
+//                       return Padding(
+//                         padding: const EdgeInsets.symmetric(vertical: 8.0),
+//                         child: Column(
+//                           crossAxisAlignment: CrossAxisAlignment.start,
+//                           children: [
+//                             Text(s.nombre, style: TextStyle(fontWeight: FontWeight.bold)),
+//                             Row(
+//                               children: [
+//                                 Expanded(
+//                                   child: TextFormField(
+//                                     initialValue:
+//                                         s.monto > 0 ? s.monto.toString() : '',
+//                                     keyboardType: TextInputType.number,
+//                                     decoration: InputDecoration(
+//                                       labelText: 'Monto',
+//                                       border: OutlineInputBorder(),
+//                                     ),
+//                                     onChanged: (val) {
+//                                       setStateDialog(() {
+//                                         s.monto = double.tryParse(val) ?? 0;
+//                                       });
+//                                     },
+//                                   ),
+//                                 ),
+//                                 SizedBox(width: 10),
+//                                 Expanded(
+//                                   child: DropdownButtonFormField<String>(
+//                                     value: s.proveedor.isNotEmpty
+//                                         ? s.proveedor
+//                                         : null,
+//                                     hint: Text("Proveedor"),
+//                                     items: proveedores
+//                                         .map((p) => DropdownMenuItem(
+//                                               value: p,
+//                                               child: Text(p),
+//                                             ))
+//                                         .toList(),
+//                                     onChanged: (value) {
+//                                       setStateDialog(() {
+//                                         s.proveedor = value ?? '';
+//                                       });
+//                                     },
+//                                     decoration: InputDecoration(
+//                                       border: OutlineInputBorder(),
+//                                     ),
+//                                   ),
+//                                 ),
+//                               ],
+//                             ),
+//                           ],
+//                         ),
+//                       );
+//                     }).toList(),
 
-                    SizedBox(height: 20),
+//                     SizedBox(height: 20),
 
-                    Text("Categoría:", style: TextStyle(fontWeight: FontWeight.bold)),
-                    DropdownButton<String>(
-                      value: categoria,
-                      isExpanded: true,
-                      items: ['Pago', 'Cobro']
-                          .map((c) =>
-                              DropdownMenuItem(value: c, child: Text(c)))
-                          .toList(),
-                      onChanged: (value) {
-                        if (value != null) {
-                          setStateDialog(() {
-                            categoria = value;
-                          });
-                        }
-                      },
-                    ),
+//                     Text("Categoría:", style: TextStyle(fontWeight: FontWeight.bold)),
+//                     DropdownButton<String>(
+//                       value: categoria,
+//                       isExpanded: true,
+//                       items: ['Pago', 'Cobro']
+//                           .map((c) =>
+//                               DropdownMenuItem(value: c, child: Text(c)))
+//                           .toList(),
+//                       onChanged: (value) {
+//                         if (value != null) {
+//                           setStateDialog(() {
+//                             categoria = value;
+//                           });
+//                         }
+//                       },
+//                     ),
 
-                    SizedBox(height: 10),
+//                     SizedBox(height: 10),
 
-                    Text("Origen del movimiento:", style: TextStyle(fontWeight: FontWeight.bold)),
-                    DropdownButton<String>(
-                      value: tipoOrigen,
-                      isExpanded: true,
-                      items: ['Proveedor', 'Tienda', 'Personal']
-                          .map((o) =>
-                              DropdownMenuItem(value: o, child: Text(o)))
-                          .toList(),
-                      onChanged: (value) {
-                        if (value != null) {
-                          setStateDialog(() {
-                            tipoOrigen = value;
-                            nombreOrigen = '';
-                          });
-                        }
-                      },
-                    ),
+//                     Text("Origen del movimiento:", style: TextStyle(fontWeight: FontWeight.bold)),
+//                     DropdownButton<String>(
+//                       value: tipoOrigen,
+//                       isExpanded: true,
+//                       items: ['Proveedor', 'Tienda', 'Personal']
+//                           .map((o) =>
+//                               DropdownMenuItem(value: o, child: Text(o)))
+//                           .toList(),
+//                       onChanged: (value) {
+//                         if (value != null) {
+//                           setStateDialog(() {
+//                             tipoOrigen = value;
+//                             nombreOrigen = '';
+//                           });
+//                         }
+//                       },
+//                     ),
 
-                    SizedBox(height: 10),
+//                     SizedBox(height: 10),
 
-                    DropdownButton<String>(
-                      value: nombreOrigen.isEmpty ? null : nombreOrigen,
-                      hint: Text('Seleccionar nombre'),
-                      isExpanded: true,
-                      items: opcionesNombre
-                          .map((n) => DropdownMenuItem(
-                              value: n, child: Text(n)))
-                          .toList(),
-                      onChanged: (value) {
-                        if (value != null) {
-                          setStateDialog(() {
-                            nombreOrigen = value;
-                          });
-                        }
-                      },
-                    ),
+//                     DropdownButton<String>(
+//                       value: nombreOrigen.isEmpty ? null : nombreOrigen,
+//                       hint: Text('Seleccionar nombre'),
+//                       isExpanded: true,
+//                       items: opcionesNombre
+//                           .map((n) => DropdownMenuItem(
+//                               value: n, child: Text(n)))
+//                           .toList(),
+//                       onChanged: (value) {
+//                         if (value != null) {
+//                           setStateDialog(() {
+//                             nombreOrigen = value;
+//                           });
+//                         }
+//                       },
+//                     ),
 
-                    SizedBox(height: 20),
-                    Divider(),
-                    Text("Total: \$${total.toStringAsFixed(2)}",
-                        style: TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.bold)),
-                  ],
-                ),
-              ),
-              actions: [
-                TextButton(
-                    onPressed: () => Navigator.pop(context),
-                    child: Text('Cancelar')),
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                      content: Text('Movimiento guardado para $nombreOrigen'),
-                    ));
-                  },
-                  child: Text('Guardar'),
-                )
-              ],
-            );
-          },
-        );
-      },
-    );
-  }
-  @override
+//                     SizedBox(height: 20),
+//                     Divider(),
+//                     Text("Total: \$${total.toStringAsFixed(2)}",
+//                         style: TextStyle(
+//                             fontSize: 16, fontWeight: FontWeight.bold)),
+//                   ],
+//                 ),
+//               ),
+//               actions: [
+//                 TextButton(
+//                     onPressed: () => Navigator.pop(context),
+//                     child: Text('Cancelar')),
+//                 ElevatedButton(
+//                   onPressed: () {
+//                     Navigator.pop(context);
+//                     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+//                       content: Text('Movimiento guardado para $nombreOrigen'),
+//                     ));
+//                   },
+//                   child: Text('Guardar'),
+//                 )
+//               ],
+//             );
+//           },
+//         );
+//       },
+//     );
+//   }
+//   @override
 
 
 
 
   
-  Widget build(BuildContext context) {
-    return Scaffold(
-           floatingActionButton: FloatingActionButton(
-        onPressed: () {
-     _abrirDialogoMovimiento(context);
-        },
-        child: Icon(Icons.add),
-        backgroundColor: Colors.blueAccent,
-      ),
-      appBar: AppBar(title: Text("Detalles del Proyecto")),
-      body: Container(
-        child:Row(children :[
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//            floatingActionButton: FloatingActionButton(
+//         onPressed: () {
+//      _abrirDialogoMovimiento(context);
+//         },
+//         child: Icon(Icons.add),
+//         backgroundColor: Colors.blueAccent,
+//       ),
+//       appBar: AppBar(title: Text("Detalles del Proyecto")),
+//       body: Container(
+//         child:Row(children :[
 
-Flexible(flex:4,
-child:Column(children: [
-Flexible(
-  flex: 2,
-  child: Container(
-    height: double.infinity,
-    color: Colors.black12,
-    padding: EdgeInsets.all(20),
-    child: project == null // Verifica si el proyecto ya está cargado
-        ? Center(child: CircularProgressIndicator()) // Muestra un indicador de carga mientras el proyecto se carga
-        : ProjectProfileCompactSection(
-            projectName: project.nombre,
-            client: project.clienteNombre,
-            budget: project.presupuesto.toString(),
-            location: project.ubicacion,
-            startDate: project.fechaInicio.toString(),
-            endDate: project.fechaFin.toString(),
-            type:'Tipo', // Asumiendo que tienes un campo 'tipo' en tu modelo
-            estado: 'En Progreso',
-            isActive: project.estado == 'En Progreso', // Aquí puedes determinar si está activo
-            imageUrl:    "https://cdn.pixabay.com/photo/2016/11/29/09/15/architecture-1868667_960_720.jpg", // Aquí usas la URL de la imagen
-          ),
-  ),
-),
-Flexible(flex:4,
-child:
+// Flexible(flex:4,
+// child:Column(children: [
+// Flexible(
+//   flex: 2,
+//   child: Container(
+//     height: double.infinity,
+//     color: Colors.black12,
+//     padding: EdgeInsets.all(20),
+//     child: project == null // Verifica si el proyecto ya está cargado
+//         ? Center(child: CircularProgressIndicator()) // Muestra un indicador de carga mientras el proyecto se carga
+//         : ProjectProfileCompactSection(
+//             projectName: project.nombre,
+//             client: project.clienteNombre,
+//             budget: project.presupuesto.toString(),
+//             location: project.ubicacion,
+//             startDate: project.fechaInicio.toString(),
+//             endDate: project.fechaFin.toString(),
+//             type:'Tipo', // Asumiendo que tienes un campo 'tipo' en tu modelo
+//             estado: 'En Progreso',
+//             isActive: project.estado == 'En Progreso', // Aquí puedes determinar si está activo
+//             imageUrl:    "https://cdn.pixabay.com/photo/2016/11/29/09/15/architecture-1868667_960_720.jpg", // Aquí usas la URL de la imagen
+//           ),
+//   ),
+// ),
+// Flexible(flex:4,
+// child:
 
-Container(width: double.infinity,  
-  height:double.infinity,child: Center(
+// Container(width: double.infinity,  
+//   height:double.infinity,child: Center(
 
-    child: GastosPage(),
-  ),)
-
-
-),
+//     child: GastosPage(),
+//   ),)
 
 
-])
-),
-
-        ]
+// ),
 
 
+// ])
+// ),
+
+//         ]
 
 
 
-        )
 
 
-      )
+//         )
+
+
+//       )
       
   
-    );
-  }
-}
+//     );
+//   }
+// }
 
 
 class ResumeCards extends StatelessWidget {

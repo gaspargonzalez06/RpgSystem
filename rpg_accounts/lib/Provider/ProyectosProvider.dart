@@ -13,7 +13,7 @@ class ProyectoProvider with ChangeNotifier {
   // Obtener todos los proyectos del servidor
   Future<void> fetchProyectos() async {
     try {
-      final response = await http.get(Uri.parse('http://localhost:3000/proyectos'));
+      final response = await http.get(Uri.parse('http://localhost:3002/proyectos'));
 
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
