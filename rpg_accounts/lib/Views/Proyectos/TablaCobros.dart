@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:rpg_accounts/Models/Proveedores.dart';
 import 'package:rpg_accounts/Provider/MovimientosProvider.dart';
 
 class GastosPage extends StatefulWidget {
@@ -8,7 +9,7 @@ class GastosPage extends StatefulWidget {
 
 class _GastosPageState extends State<GastosPage> {
 
-  List<String> proveedoresDropDown = [];  // Lista que almacenará los proveedores dinámicamente
+  List<ProveedorModel> proveedoresDropDown = [];  // Lista que almacenará los proveedores dinámicamente
   final ProveedorMovimientoProvider proveedorProvider = ProveedorMovimientoProvider();
 
   // Inicializa el estado y obtiene los proveedores
@@ -19,15 +20,15 @@ class _GastosPageState extends State<GastosPage> {
   }
 
   // Función que obtiene los proveedores según el tipo de usuario
-  Future<void> getProveedores() async {
-    await proveedorProvider.fetchProveedores();  // Llama al provider para obtener los proveedores
-    proveedoresDropDown = proveedorProvider.proveedores
-   
-          .map((proveedor) => proveedor.nombre)
-          .toList();
+ Future<void> getProveedores() async {
+  await proveedorProvider.fetchProveedores(); // Llama al provider para obtener los proveedores
 
-    setState(() {});  // Actualiza la UI después de obtener los proveedores
-  }
+  // Filtra los proveedores con tipo 3
+  proveedoresDropDown = proveedorProvider.proveedores;
+     
+
+  setState(() {}); // Actualiza la UI después de obtener los proveedores
+}
 
 
   final List<Gasto> materiales = [
@@ -104,16 +105,26 @@ void _abrirDialogoAgregarGasto(bool esMaterial) async {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    DropdownButtonFormField<String>(
-                      decoration: InputDecoration(labelText: 'Proveedor'),
-                      value: proveedorSeleccionado.isNotEmpty ? proveedorSeleccionado : null,
-                      items: proveedoresDropDown
-                          .map((p) => DropdownMenuItem(value: p, child: Text(p)))
-                          .toList(),
-                      onChanged: (value) {
-                        setStateSimple(() => proveedorSeleccionado = value ?? '');
-                      },
-                    ),
+ DropdownButtonFormField<String>(
+  decoration: InputDecoration(labelText: 'Proveedor'),
+  value: proveedorSeleccionado.isNotEmpty ? proveedorSeleccionado : null,
+  items: proveedoresDropDown
+      .where((proveedor) => esMaterial 
+          ? proveedor.tipoUsuario == 3 
+          : proveedor.tipoUsuario == 2)  // Filtra según el tipo
+      .map((proveedor) {
+        return DropdownMenuItem<String>(
+          value: proveedor.id.toString(),  // Usa el ID del proveedor como valor
+          child: Text(proveedor.nombre),  // Muestra el nombre del proveedor
+        );
+      }).toList(),
+  onChanged: (value) {
+    setStateSimple(() => proveedorSeleccionado = value ?? '');
+  },
+)
+
+
+,
                     SizedBox(height: 10),
                     TextFormField(
                       decoration: InputDecoration(
@@ -178,16 +189,24 @@ void _abrirDialogoAgregarGasto(bool esMaterial) async {
           content: SingleChildScrollView(
             child: Column(
               children: [
-                DropdownButtonFormField<String>(
-                  decoration: InputDecoration(labelText: 'Proveedor de la factura'),
-                  value: proveedorFactura.isNotEmpty ? proveedorFactura : null,
-                  items: proveedoresDropDown
-                      .map((p) => DropdownMenuItem(value: p, child: Text(p)))
-                      .toList(),
-                  onChanged: (value) {
-                    setStateDialog(() => proveedorFactura = value ?? '');
-                  },
-                ),
+      DropdownButtonFormField<String>(
+  decoration: InputDecoration(labelText: 'Proveedor'),
+  value: proveedorFactura.isNotEmpty ? proveedorFactura : null,
+  items: proveedoresDropDown
+      .where((proveedor) => esMaterial 
+          ? proveedor.tipoUsuario == 3 
+          : proveedor.tipoUsuario == 2)  // Filtra según el tipo
+      .map((proveedor) {
+        return DropdownMenuItem<String>(
+          value: proveedor.id.toString(),  // Usa el ID del proveedor como valor
+          child: Text(proveedor.nombre),  // Muestra el nombre del proveedor
+        );
+      }).toList(),
+  onChanged: (value) {
+    setStateDialog(() => proveedorFactura = value ?? '');
+  },
+),
+
                 SizedBox(height: 10),
                 TextFormField(
                   decoration: InputDecoration(

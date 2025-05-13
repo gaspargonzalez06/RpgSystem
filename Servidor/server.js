@@ -140,6 +140,43 @@ app.post('/crear_usuario', (req, res) => {
   );
 });
 
+//movimientos contables
+
+app.post('/crear_movimiento', (req, res) => {
+  const {
+    Id_Ciente,
+    Id_Servicio,
+    Id_Tipo_Movimiento,
+    Monto,
+    Comentario,
+    Id_Proyecto,
+    Id_Admin,
+    Id_Trabajador,
+    Id_Proveedor
+  } = req.body;
+
+  const query = `
+    INSERT INTO movimientos_contables 
+    (Id_Ciente, Id_Servicio, Id_Tipo_Movimiento, Monto, Comentario, Fecha_Movimiento, Id_Proyecto, Id_Admin, Id_Trabajador, Id_Proveedor)
+    VALUES (?, ?, ?, ?, ?, NOW(), ?, ?, ?, ?);
+  `;
+
+  db.query(
+    query,
+    [Id_Ciente, Id_Servicio, Id_Tipo_Movimiento, Monto, Comentario, Id_Proyecto, Id_Admin, Id_Trabajador, Id_Proveedor],
+    (err, result) => {
+      if (err) {
+        console.error('Error al insertar movimiento:', err);
+        return res.status(500).json({ error: 'Error al insertar el movimiento' });
+      }
+
+      res.status(200).json({ message: 'Movimiento creado correctamente', id: result.insertId });
+    }
+  );
+});
+
+
+
 // Iniciar servidor
 app.listen(PORT, () => {
   console.log(`Servidor corriendo en http://localhost:${PORT}`);

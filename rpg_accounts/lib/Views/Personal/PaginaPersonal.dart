@@ -4,13 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:rpg_accounts/Drawer/AppDrawer.dart';
 
 import 'package:http/http.dart' as http;
+import 'package:rpg_accounts/Models/Usuarios/UsuariosSistema.dart';
 class AgregarPersonalManoDeObra extends StatefulWidget {
   @override
   _AgregarPersonalManoDeObraState createState() => _AgregarPersonalManoDeObraState();
 }
 
 class _AgregarPersonalManoDeObraState extends State<AgregarPersonalManoDeObra> {
-  List<Proveedor> proveedores = [];
+
   List<String> tipos = ['Todos', 'Personal', 'Proveedor'];
   String selectedTipo = 'Todos';
   TextEditingController nombreController = TextEditingController();
@@ -25,23 +26,84 @@ final direccionController = TextEditingController();
 int tipoUsuarioSeleccionado = 2; // 2 = Personal, 3 = Proveedor
 
   @override
-  void initState() {
-    super.initState();
-    proveedores.addAll([
-      Proveedor(nombre: 'Juan Pérez', contacto: '123456789', tipo: 'Personal', comentario: 'Electricista experto', deudas: [DeudaPago(montoPago: 500)]),
-      Proveedor(nombre: 'Ana Gómez', contacto: '987654321', tipo: 'Proveedor', comentario: 'Proveedor de pintura', deudas: [DeudaPago(montoPago: 300)]),
-      Proveedor(nombre: 'Carlos López', contacto: '111222333', tipo: 'Personal', comentario: 'Fontanero certificado', deudas: [DeudaPago(montoPago: 100)]),
-      Proveedor(nombre: 'María Ruiz', contacto: '444555666', tipo: 'Proveedor', comentario: 'Suministro de materiales', deudas: [DeudaPago(montoPago: 200)]),
-    ]);
+@override
+void initState() {
+  super.initState();
+  cargarUsuarios();
+}
+void cargarUsuarios() async {
+  try {
+    final data = await obtenerUsuarios();
+    setState(() {
+      usuarios = data;
+      usuariosFiltrados = data;
+    });
+  } catch (e) {
+    print('Error: $e');
   }
+}
+List<UsuarioSistema> usuarios = [];
+List<UsuarioSistema> usuariosFiltrados = [];
+
+
+Future<void> crearUsuario(String nombre, int tipo, String telefono, String cedula, String licencia, String direccion) async {
+  final response = await http.post(
+    Uri.parse('http://localhost:3000/crear_usuario'),
+    headers: {'Content-Type': 'application/json'},
+    body: json.encode({
+      'Nombre_Usuario': nombre,
+      'Id_Tipo_Usuario': tipo,
+      'Telefono': telefono,
+      'Cedula': cedula,
+      'Licencia': licencia,
+      'Direccion': direccion,
+    }),
+  );
+
+  if (response.statusCode == 200) {
+    print('Usuario creado correctamente');
+  } else {
+    print('Error al crear usuario: ${response.statusCode}');
+  }
+}
+
+Future<List<UsuarioSistema>> obtenerUsuarios() async {
+  final response = await http.get(Uri.parse('http://localhost:3000/usuarios'));
+
+  if (response.statusCode == 200) {
+    final List<dynamic> data = json.decode(response.body);
+    return data.map((json) => UsuarioSistema.fromJson(json)).toList();
+  } else {
+    throw Exception('Error al cargar los usuarios');
+  }
+}
+List<PagoUsuario> pagosUsuario = [];
+
+void filtrarUsuarios() {
+  final texto = searchController.text.toLowerCase();
+
+  setState(() {
+    usuariosFiltrados = usuarios.where((u) {
+      final coincideNombre = u.nombre.toLowerCase().contains(texto);
+      final coincideTipo = selectedTipo == 'Todos' || selectedTipo == tipoUsuario(u.tipo);
+      return coincideNombre && coincideTipo;
+    }).toList();
+  });
+}
+
+String tipoUsuario(int tipo) {
+  switch (tipo) {
+    case 1: return 'Administrador';
+    case 2: return 'Conductor';
+    case 3: return 'Proveedor';
+    case 4: return 'Cliente';
+    default: return 'Desconocido';
+  }
+}
 
   @override
   Widget build(BuildContext context) {
-    List<Proveedor> proveedoresFiltrados = proveedores.where((proveedor) {
-      final matchTexto = proveedor.nombre.toLowerCase().contains(searchController.text.toLowerCase()) || proveedor.comentario.toLowerCase().contains(searchController.text.toLowerCase());
-      final matchTipo = selectedTipo == 'Todos' || proveedor.tipo == selectedTipo;
-      return matchTexto && matchTipo;
-    }).toList();return
+ return
 Scaffold(
   appBar: AppBar(
     backgroundColor: Colors.black,
@@ -82,31 +144,32 @@ Scaffold(
             crossAxisCount: 8, // Cambié a 5 para que haya 5 elementos por fila
             mainAxisSpacing: 20,
             crossAxisSpacing: 20,
-            children: proveedoresFiltrados.map((proveedor) {
-              final totalPagado = proveedor.deudas.fold(0.0, (sum, d) => sum + d.montoPago);
-              return Card(
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                elevation: 5,
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(12),
-                  onTap: () => _mostrarDetallesProveedor(context, proveedor),
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(proveedor.nombre, style: TextStyle(fontWeight: FontWeight.bold)),
-                        Text(proveedor.tipo, style: TextStyle(color: Colors.grey[700])),
-                        Text('Comentario: ${proveedor.comentario}', overflow: TextOverflow.ellipsis),
-                        SizedBox(height: 4),
-                        Text('Pagado: \$${totalPagado.toStringAsFixed(2)}'),
-                        Text('Pendiente: \$${(4000 - totalPagado).toStringAsFixed(2)}'),
-                      ],
-                    ),
-                  ),
-                ),
-              );
-            }).toList(),
+         children: usuariosFiltrados.map((usuario) {
+  return Card(
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+    elevation: 5,
+    child: InkWell(
+      borderRadius: BorderRadius.circular(12),
+      onTap: () {
+_mostrarDetallesUsuario(context, usuario, pagosUsuario);
+
+      },
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(usuario.nombre, style: TextStyle(fontWeight: FontWeight.bold)),
+            Text(tipoUsuario(usuario.tipo), style: TextStyle(color: Colors.grey[700])),
+            Text('Tel: ${usuario.telefono ?? 'N/D'}'),
+            Text('Dirección: ${usuario.direccion ?? 'N/D'}', overflow: TextOverflow.ellipsis),
+          ],
+        ),
+      ),
+    ),
+  );
+}).toList(),
+
           ),
         ),
       ],
@@ -178,76 +241,129 @@ void _mostrarFormularioAgregarProveedor(BuildContext context) {
     ),
   );
 }
-Future<void> crearUsuario(String nombre, int tipo, String telefono, String cedula, String licencia, String direccion) async {
-  final response = await http.post(
-    Uri.parse('http://localhost:3000/crear_usuario'),
-    headers: {'Content-Type': 'application/json'},
-    body: json.encode({
-      'Nombre_Usuario': nombre,
-      'Id_Tipo_Usuario': tipo,
-      'Telefono': telefono,
-      'Cedula': cedula,
-      'Licencia': licencia,
-      'Direccion': direccion,
-    }),
-  );
 
-  if (response.statusCode == 200) {
-    print('Usuario creado correctamente');
-  } else {
-    print('Error al crear usuario: ${response.statusCode}');
-  }
+Widget buildUsuarioCard(BuildContext context, UsuarioSistema usuario) {
+  return Card(
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+    elevation: 5,
+    child: InkWell(
+      borderRadius: BorderRadius.circular(12),
+      onTap: () {
+        // Aquí podrías mostrar detalles del usuario si deseas
+        showDialog(
+          context: context,
+          builder: (_) => AlertDialog(
+            title: Text(usuario.nombre),
+            content: Text('Dirección: ${usuario.direccion ?? "No registrada"}'),
+          ),
+        );
+      },
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(usuario.nombre, style: TextStyle(fontWeight: FontWeight.bold)),
+            Text('Tipo de usuario: ${usuario.tipo}', style: TextStyle(color: Colors.grey[700])),
+            if (usuario.direccion != null)
+              Text('Dirección: ${usuario.direccion}'),
+          ],
+        ),
+      ),
+    ),
+  );
+}
+void _mostrarDetallesUsuario(BuildContext context, UsuarioSistema usuario, List<PagoUsuario> pagos) {
+  TextEditingController montoController = TextEditingController();
+
+  showDialog(
+    context: context,
+    builder: (_) => StatefulBuilder(
+      builder: (context, setModalState) {
+        double totalPagado = pagos.fold(0, (sum, pago) => sum + pago.monto);
+
+        return AlertDialog(
+          title: Text('Detalles de ${usuario.nombre}'),
+          content: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Tipo Usuario: ${usuario.tipo}'),
+                if (usuario.telefono != null) Text('Teléfono: ${usuario.telefono}'),
+                if (usuario.cedula != null) Text('Cédula: ${usuario.cedula}'),
+                if (usuario.licencia != null) Text('Licencia: ${usuario.licencia}'),
+                if (usuario.direccion != null) Text('Dirección: ${usuario.direccion}'),
+                SizedBox(height: 20),
+
+                Text('Pagos Realizados:', style: TextStyle(fontWeight: FontWeight.bold)),
+
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: DataTable(
+                    columns: const [
+                      DataColumn(label: Text('N°')),
+                      DataColumn(label: Text('Monto')),
+                      DataColumn(label: Text('Fecha')),
+                    ],
+                    rows: List.generate(pagos.length, (index) {
+                      final pago = pagos[index];
+                      return DataRow(cells: [
+                        DataCell(Text('${index + 1}')),
+                        DataCell(Text('\$${pago.monto.toStringAsFixed(2)}')),
+                        DataCell(Text('${pago.fecha.day}/${pago.fecha.month}/${pago.fecha.year}')),
+                      ]);
+                    }),
+                  ),
+                ),
+
+                Divider(),
+
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text('Total Pagado: \$${totalPagado.toStringAsFixed(2)}'),
+                    Text('Total Final: \$----'), // Reservado para lógica futura
+                  ],
+                ),
+
+                SizedBox(height: 10),
+
+                TextField(
+                  controller: montoController,
+                  keyboardType: TextInputType.number,
+                  decoration: InputDecoration(labelText: 'Nuevo pago'),
+                ),
+
+                SizedBox(height: 10),
+
+                ElevatedButton(
+                  onPressed: () {
+                    final monto = double.tryParse(montoController.text);
+                    if (monto != null && monto > 0) {
+                      setModalState(() {
+                        pagos.add(PagoUsuario(monto: monto, fecha: DateTime.now()));
+                        montoController.clear();
+                      });
+                    }
+                  },
+                  child: Text('Agregar Pago'),
+                )
+              ],
+            ),
+          ),
+        );
+      },
+    ),
+  );
 }
 
-  void _mostrarDetallesProveedor(BuildContext context, Proveedor proveedor) {
-    TextEditingController montoController = TextEditingController();
-    showDialog(
-      context: context,
-      builder: (_) => StatefulBuilder(
-        builder: (context, setModalState) {
-          double totalPagado = proveedor.deudas.fold(0, (sum, item) => sum + item.montoPago);
-          return AlertDialog(
-            title: Text('Detalles de ${proveedor.nombre}'),
-            content: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Contacto: ${proveedor.contacto}'),
-                  Text('Tipo: ${proveedor.tipo}'),
-                  Text('Comentario: ${proveedor.comentario}'),
-                  SizedBox(height: 10),
-                  Text('Pagos:'),
-                  Column(
-                    children: proveedor.deudas.map((d) => Text('- \$${d.montoPago.toStringAsFixed(2)}')).toList(),
-                  ),
-                  Divider(),
-                  Text('Total Pagado: \$${totalPagado.toStringAsFixed(2)}'),
-                  Text('Saldo Pendiente: \$${(4000 - totalPagado).toStringAsFixed(2)}'),
-                  TextField(
-                    controller: montoController,
-                    keyboardType: TextInputType.number,
-                    decoration: InputDecoration(labelText: 'Nuevo pago'),
-                  ),
-                  SizedBox(height: 10),
-                  ElevatedButton(
-                    onPressed: () {
-                      final monto = double.tryParse(montoController.text);
-                      if (monto != null && monto > 0) {
-                        setState(() => proveedor.deudas.add(DeudaPago(montoPago: monto)));
-                        setModalState(() {});
-                        montoController.clear();
-                      }
-                    },
-                    child: Text('Agregar Pago'),
-                  )
-                ],
-              ),
-            ),
-          );
-        },
-      ),
-    );
-  }
+}
+
+class PagoUsuario {
+  final double monto;
+  final DateTime fecha;
+
+  PagoUsuario({required this.monto, required this.fecha});
 }
 
 class Proveedor {

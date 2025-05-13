@@ -17,25 +17,26 @@ class ProveedorMovimientoProvider with ChangeNotifier {
   String? get errorMessage => _errorMessage;
 
   // Obtener todos los proveedores del servidor
-  Future<void> fetchProveedores() async {
-    try {
-      final response = await http.get(Uri.parse('http://localhost:3000/proveedores'));
+Future<void> fetchProveedores() async {
+  try {
+    final response = await http.get(Uri.parse('http://localhost:3000/proveedores'));
 
-      if (response.statusCode == 200) {
-        final List<dynamic> data = json.decode(response.body);
+    if (response.statusCode == 200) {
+      final List<dynamic> data = json.decode(response.body);
 
-        _proveedores = data.map((item) => ProveedorModel.fromJson(item)).toList();
-        _errorMessage = null;
-        notifyListeners();
-      } else {
-        _errorMessage = 'Error: ${response.statusCode}';
-        notifyListeners();
-      }
-    } catch (e) {
-      _errorMessage = 'Error al hacer la solicitud HTTP: $e';
+      // Convierte los datos en una lista de proveedores
+      _proveedores = data.map((item) => ProveedorModel.fromJson(item)).toList();
+      _errorMessage = null;
+      notifyListeners();
+    } else {
+      _errorMessage = 'Error: ${response.statusCode}';
       notifyListeners();
     }
+  } catch (e) {
+    _errorMessage = 'Error al hacer la solicitud HTTP: $e';
+    notifyListeners();
   }
+}
 
   // Obtener movimientos contables por Id de proyecto
   Future<void> fetchMovimientosPorProyecto(int idProyecto) async {
@@ -61,4 +62,50 @@ class ProveedorMovimientoProvider with ChangeNotifier {
       notifyListeners();
     }
   }
+
+Future<void> agregarMovimientoContable({
+  required int idCliente,
+  required int idServicio,
+  required int idTipoMovimiento,
+  required double monto,
+  required String comentario,
+  required int idProyecto,
+  required int idAdmin,
+  int? idTrabajador,
+  int? idProveedor,
+}) async {
+  final url = Uri.parse('http://localhost:3000/crear_movimiento');
+
+  final Map<String, dynamic> body = {
+    'Id_Ciente': idCliente,
+    'Id_Servicio': idServicio,
+    'Id_Tipo_Movimiento': idTipoMovimiento,
+    'Monto': monto,
+    'Comentario': comentario,
+    'Id_Proyecto': idProyecto,
+    'Id_Admin': idAdmin,
+    'Id_Trabajador': idTrabajador,
+    'Id_Proveedor': idProveedor,
+  };
+
+  try {
+    final response = await http.post(
+      url,
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode(body),
+    );
+
+    if (response.statusCode == 200) {
+      // Movimiento agregado exitosamente
+      print('Movimiento creado correctamente');
+    } else {
+      // Error en la respuesta del servidor
+      print('Error al crear el movimiento: ${response.statusCode}');
+    }
+  } catch (e) {
+    // Error en la solicitud HTTP
+    print('Error al hacer la solicitud HTTP: $e');
+  }
+}
+
 }
