@@ -1,14 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:rpg_accounts/Drawer/AppDrawer.dart';
+import 'package:rpg_accounts/Models/Usuarios/USistema.dart';
+import 'package:rpg_accounts/Provider/ComentariosProvider.dart';
 import 'package:rpg_accounts/Provider/MovimientosProvider.dart';
 import 'package:rpg_accounts/Provider/ProyectosProvider.dart';
+import 'package:rpg_accounts/Views/Login/LoginPage.dart';
 import 'package:rpg_accounts/Views/Materiales.dart';
 import 'package:rpg_accounts/Views/Proyectos.dart';
+import 'package:rpg_accounts/Widgets/Utils.dart';
 
 import 'package:syncfusion_flutter_charts/charts.dart';
 
 void main() {
+  
   runApp(MyApp());
 }
 
@@ -19,13 +24,15 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (_) => ProyectoProvider()), // ✅ Aquí se registra
         ChangeNotifierProvider(create: (_) => ProveedorMovimientoProvider()), // ✅ Aquí se registra
-    
+        ChangeNotifierProvider(create: (_) => ComentarioProvider()), // ✅ Aquí se registra |
          
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         theme: ThemeData(primarySwatch: Colors.blue),
-        home: HomePage(),
+        home: LoginPage()
+        
+        //HomePage(),
       ),
     );
   }
@@ -170,12 +177,13 @@ class BalanceScreen extends StatelessWidget {
 }
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  final UsuarioSistemaRPG usuario;
+
+  const HomePage({super.key, required this.usuario});
 
   @override
   State<HomePage> createState() => _HomePageState();
 }
-
 class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
@@ -376,6 +384,9 @@ class RowWidget extends StatelessWidget {
 
 
 class PaginaPrincipal extends StatefulWidget {
+  
+
+  
   @override
   State<PaginaPrincipal> createState() => _PaginaPrincipalState();
 }
@@ -402,6 +413,10 @@ class _PaginaPrincipalState extends State<PaginaPrincipal> {
       length: 3,
       child: Scaffold(
         appBar: AppBar(
+          title: Text(
+            "Inicio",
+            style: TextStyle(color: Colors.white),
+          ),    
           backgroundColor: Colors.black,
           iconTheme: IconThemeData(color: Colors.white),
         ),
@@ -462,104 +477,104 @@ class _PaginaPrincipalState extends State<PaginaPrincipal> {
 }
 
 
-class ProyectoTable extends StatelessWidget {
-  final List<Map<String, dynamic>> proyectos = [
-    {'nombre': 'Proyecto ABC', 'dias': 20},
-    {'nombre': 'Proyecto XYZ', 'dias': 35},
-    {'nombre': 'Proyecto 123', 'dias': 18},
-    {'nombre': 'Proyecto ABC', 'dias': 20},
-    {'nombre': 'Proyecto XYZ', 'dias': 35},
-    {'nombre': 'Proyecto 123', 'dias': 18},
-  ];
+// class ProyectoTable extends StatelessWidget {
+//   final List<Map<String, dynamic>> proyectos = [
+//     {'nombre': 'Proyecto ABC', 'dias': 20},
+//     {'nombre': 'Proyecto XYZ', 'dias': 35},
+//     {'nombre': 'Proyecto 123', 'dias': 18},
+//     {'nombre': 'Proyecto ABC', 'dias': 20},
+//     {'nombre': 'Proyecto XYZ', 'dias': 35},
+//     {'nombre': 'Proyecto 123', 'dias': 18},
+//   ];
 
-  Color getAlertColor(int dias) {
-    if (dias > 30) {
-      return Colors.yellow.shade700; // Amarillo para más de 30 días
-    } else if (dias > 15) {
-      return Colors.blue.shade700; // Azul para días entre 15 y 30
-    } else {
-      return Colors.green.shade700; // Verde para días menores a 15
-    }
-  }
+//   Color getAlertColor(int dias) {
+//     if (dias > 30) {
+//       return Colors.yellow.shade700; // Amarillo para más de 30 días
+//     } else if (dias > 15) {
+//       return Colors.blue.shade700; // Azul para días entre 15 y 30
+//     } else {
+//       return Colors.green.shade700; // Verde para días menores a 15
+//     }
+//   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
 
-      body: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              Text(
-                'Alertas Proyectos',
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              SizedBox(height: 10),
-              // Cuadrícula de 4 elementos por fila
-              GridView.builder(
-                shrinkWrap: true, // Esto permite que el GridView ocupe el espacio disponible sin desbordarse
-                physics: NeverScrollableScrollPhysics(), // Deshabilitar desplazamiento en el GridView
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 4, // 4 elementos por fila
-                  crossAxisSpacing: 10,
-                  mainAxisSpacing: 10,
-                  childAspectRatio: 1.0, // Ajustar el tamaño de cada card
-                ),
-                itemCount: proyectos.length,
-                itemBuilder: (context, index) {
-                  final proyecto = proyectos[index];
-                  return Card(
-                    elevation: 5,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            proyecto['nombre'],
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 10, // Reducir tamaño de texto
-                            ),
-                          ),
-                          SizedBox(height: 15),
-                          // Mostrar el número de días con el color correspondiente
-                          Container(
-                            padding: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-                            decoration: BoxDecoration(
-                              color: getAlertColor(proyecto['dias']),
-                              borderRadius: BorderRadius.circular(5),
-                            ),
-                            child: Text(
-                              '${proyecto['dias']} días',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 12, // Reducir tamaño de texto
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
+//       body: Padding(
+//         padding: const EdgeInsets.all(8.0),
+//         child: SingleChildScrollView(
+//           child: Column(
+//             children: [
+//               Text(
+//                 'Alertas Proyectos',
+//                 style: TextStyle(
+//                   color: Colors.black,
+//                   fontSize: 14,
+//                   fontWeight: FontWeight.bold,
+//                 ),
+//               ),
+//               SizedBox(height: 10),
+//               // Cuadrícula de 4 elementos por fila
+//               GridView.builder(
+//                 shrinkWrap: true, // Esto permite que el GridView ocupe el espacio disponible sin desbordarse
+//                 physics: NeverScrollableScrollPhysics(), // Deshabilitar desplazamiento en el GridView
+//                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+//                   crossAxisCount: 4, // 4 elementos por fila
+//                   crossAxisSpacing: 10,
+//                   mainAxisSpacing: 10,
+//                   childAspectRatio: 1.0, // Ajustar el tamaño de cada card
+//                 ),
+//                 itemCount: proyectos.length,
+//                 itemBuilder: (context, index) {
+//                   final proyecto = proyectos[index];
+//                   return Card(
+//                     elevation: 5,
+//                     shape: RoundedRectangleBorder(
+//                       borderRadius: BorderRadius.circular(10),
+//                     ),
+//                     child: Padding(
+//                       padding: const EdgeInsets.all(8.0),
+//                       child: Column(
+//                         crossAxisAlignment: CrossAxisAlignment.start,
+//                         children: [
+//                           Text(
+//                             proyecto['nombre'],
+//                             style: TextStyle(
+//                               fontWeight: FontWeight.bold,
+//                               fontSize: 10, // Reducir tamaño de texto
+//                             ),
+//                           ),
+//                           SizedBox(height: 15),
+//                           // Mostrar el número de días con el color correspondiente
+//                           Container(
+//                             padding: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+//                             decoration: BoxDecoration(
+//                               color: getAlertColor(proyecto['dias']),
+//                               borderRadius: BorderRadius.circular(5),
+//                             ),
+//                             child: Text(
+//                               '${proyecto['dias']} días',
+//                               style: TextStyle(
+//                                 color: Colors.white,
+//                                 fontWeight: FontWeight.bold,
+//                                 fontSize: 12, // Reducir tamaño de texto
+//                               ),
+//                             ),
+//                           ),
+//                         ],
+//                       ),
+//                     ),
+//                   );
+//                 },
+//               ),
+//             ],
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+// }
 
 class BankAccountSummary extends StatefulWidget {
   @override
@@ -567,153 +582,510 @@ class BankAccountSummary extends StatefulWidget {
 }
 
 class _BankAccountSummaryState extends State<BankAccountSummary> {
-  final List<Map<String, dynamic>> transactions = [
-    {"tipo": "Ingreso", "monto": 1000.0},
-    {"tipo": "Ingreso", "monto": 750.0},
-    {"tipo": "Salida", "monto": 500.0},
-    {"tipo": "Salida", "monto": 200.0},
-    {"tipo": "Ingreso", "monto": 600.0},
-    {"tipo": "Salida", "monto": 300.0},
-    {"tipo": "Ingreso", "monto": 450.0},
-    {"tipo": "Salida", "monto": 250.0},
-  ];
-
-  late double totalIngresos;
-  late double totalSalidas;
-  late double saldoTotal;
+  bool _isLoading = false;
 
   @override
   void initState() {
     super.initState();
-    _calculateTotals();
+    _loadData();
   }
 
-  void _calculateTotals() {
-    totalIngresos = 0;
-    totalSalidas = 0;
-
-    for (var transaction in transactions) {
-      if (transaction['tipo'] == "Ingreso") {
-        totalIngresos += transaction['monto'];
-      } else if (transaction['tipo'] == "Salida") {
-        totalSalidas += transaction['monto'];
-      }
+  Future<void> _loadData() async {
+    try {
+      await Provider.of<ProyectoProvider>(context, listen: false)
+          .fetchResumenGeneral();
+    } catch (e) {
+      // El error ya se maneja en el Consumer
     }
-
-    saldoTotal = totalIngresos - totalSalidas;
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-  body: Center(
-    child: Container(
-      decoration: BoxDecoration(
+    
+      body: Consumer<ProyectoProvider>(
+        builder: (context, provider, child) {
+          if (provider.errorMessage != null) {
+            return _buildErrorView(provider.errorMessage!);
+          }
 
-        borderRadius: BorderRadius.circular(16), // Bordes redondeados
-      ),
-      child: Card(
-        margin: EdgeInsets.all(16),
-        elevation: 6,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        child: Padding(
-          padding: const EdgeInsets.all(10.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Row(
+          if (provider.resumen == null) {
+            return Center(child: CircularProgressIndicator());
+          }
+
+          final resumen = provider.resumen!;
+          final theme = Theme.of(context);
+
+          return SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
                 children: [
-                  Flexible(
-                    flex: 3,
-                    child: Text(
-                      'Resumen Financiero',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
+                  _buildSummaryCard(
+                    context: context,
+                    title: 'Resumen General',
+                    theme: theme,
+                    items: [
+                      _buildSummaryItem(
+                        'Ingresos Totales',
+                        resumen.ingresosGenerales,
+                        Colors.green,
+                      ),
+                      _buildSummaryItem(
+                        'Egresos Totales',
+                        resumen.egresosGenerales,
+                        Colors.red,
+                      ),
+                      _buildSummaryItem(
+                        'Saldo General',
+                        resumen.saldoGenerales,
+                        resumen.saldoGenerales >= 0 ? Colors.blue : Colors.red,
+                        isTotal: true,
+                      ),
+                    ],
                   ),
-                  Flexible(
-                    flex: 1,
-                    child: IconButton(
-                      icon: Icon(Icons.edit, color: Colors.grey),
-                      onPressed: () => _showEditDialog(context),
-                    ),
+                  SizedBox(height: 16),
+                  _buildSummaryCard(
+                    context: context,
+                    title: 'Resumen Mensual',
+                    theme: theme,
+                    items: [
+                      _buildSummaryItem(
+                        'Ingresos Mensuales',
+                        resumen.ingresosMensuales,
+                        Colors.green,
+                      ),
+                      _buildSummaryItem(
+                        'Egresos Mensuales',
+                        resumen.egresosMensuales,
+                        Colors.red,
+                      ),
+                      _buildSummaryItem(
+                        'Saldo Mensual',
+                        resumen.saldoMensuales,
+                        resumen.saldoMensuales >= 0 ? Colors.blue : Colors.red,
+                        isTotal: true,
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 16),
+                  _buildBankBalanceCard(
+                    context: context,
+                    theme: theme,
+                    balance: resumen.totalBanco,
+                    onEdit: () => _showEditDialog(context, resumen.totalBanco),
                   ),
                 ],
               ),
-                Divider(thickness: 1, color: Colors.grey.shade400),
-
-                _buildRow("Total Ingresos:", totalIngresos, Colors.green),
-
-                _buildRow("Total Salidas:", totalSalidas, Colors.red),
-                Divider(thickness: 1, color: Colors.grey.shade400),
- 
-                _buildRow(
-                  "Saldo Total:",
-                  saldoTotal,
-                  saldoTotal >= 0 ? Colors.blue : Colors.red,
-                  fontWeight: FontWeight.bold,
-                ),
-              ],
             ),
-          ),
-        ),
-      ),)
+          );
+        },
+      ),
     );
   }
 
-  void _showEditDialog(BuildContext context) {
-    TextEditingController controller =
-        TextEditingController(text: saldoTotal.toStringAsFixed(2));
-
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Editar Saldo Total'),
-        content: TextField(
-          controller: controller,
-          keyboardType: TextInputType.numberWithOptions(decimal: true),
-          decoration: InputDecoration(labelText: 'Nuevo Saldo Total'),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text('Cancelar'),
+  Widget _buildErrorView(String errorMessage) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.error_outline, color: Colors.red, size: 48),
+          SizedBox(height: 16),
+          Text(
+            'Error al cargar los datos',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
-          TextButton(
-            onPressed: () {
-              double? nuevoSaldo =
-                  double.tryParse(controller.text.replaceAll(',', '.'));
-              if (nuevoSaldo != null) {
-                setState(() {
-                  saldoTotal = nuevoSaldo;
-                });
-                print("Saldo Total Actualizado: \$${nuevoSaldo.toStringAsFixed(2)}");
-              }
-              Navigator.of(context).pop();
-            },
-            child: Text('Guardar'),
+          SizedBox(height: 8),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 32.0),
+            child: Text(
+              errorMessage,
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 16),
+            ),
+          ),
+          SizedBox(height: 16),
+          ElevatedButton(
+            onPressed: _loadData,
+            child: Text('Reintentar'),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildRow(String label, double value, Color color,
-      {FontWeight fontWeight = FontWeight.normal}) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          label,
-          style: TextStyle(fontSize: 16),
+  Widget _buildSummaryCard({
+    required BuildContext context,
+    required String title,
+    required ThemeData theme,
+    required List<Widget> items,
+  }) {
+    return Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+          Text(
+  title,
+  style: TextStyle(
+    fontSize: 18, // Tamaño similar a headline6
+    fontWeight: FontWeight.bold,
+  ),
+),
+            SizedBox(height: 12),
+            Divider(thickness: 1),
+            SizedBox(height: 8),
+            ...items,
+          ],
         ),
-        Text(
-          '\$${value.toStringAsFixed(2)}',
-          style: TextStyle(fontSize: 16, fontWeight: fontWeight, color: color),
-        ),
-      ],
+      ),
     );
   }
+
+  Widget _buildSummaryItem(
+    String label,
+    double value,
+    Color color, {
+    bool isTotal = false,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(
+              label,
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: isTotal ? FontWeight.bold : FontWeight.normal,
+              ),
+            ),
+          ),
+          Text(
+            NumberFormatter.formatCurrency(value),
+            style: TextStyle(
+              fontSize: isTotal ? 18 : 16,
+              fontWeight: isTotal ? FontWeight.bold : FontWeight.normal,
+              color: color,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+Widget _buildBudgetField(TextEditingController controller) {
+  return SizedBox(
+    width: 300,
+    child: TextFormField(
+      controller: controller,
+      keyboardType: TextInputType.numberWithOptions(decimal: true),
+      inputFormatters: [
+        MoneyInputFormatter(
+          allowDecimal: true,
+          currencySymbol: '\$',
+        ),
+      ],
+      decoration: InputDecoration(
+        labelText: '💰 Presupuesto',
+        hintText: 'Ej: 1,250.50',
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        prefixIcon: const Icon(Icons.monetization_on),
+        contentPadding: const EdgeInsets.all(12),
+      ),
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'Ingrese el presupuesto';
+        }
+        final amount = MoneyInputFormatter.parseFormattedMoney(value);
+        if (amount <= 0) {
+          return 'El monto debe ser mayor a cero';
+        }
+        return null;
+      },
+      onChanged: (value) {
+        final budgetAmount = MoneyInputFormatter.parseFormattedMoney(value);
+        debugPrint('Presupuesto actualizado: $budgetAmount');
+        // Aquí actualiza el valor en tu estado/bloc/modelo
+      },
+    ),
+  );
 }
+
+  Widget _buildBankBalanceCard({
+    required BuildContext context,
+    required ThemeData theme,
+    required double balance,
+    required VoidCallback onEdit,
+  }) {
+    return Card(
+      elevation: 4,
+      color: balance >= 0
+          ? Colors.blue.shade50
+          : Colors.red.shade50,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            Row(
+  children: [
+    Text(
+      'Saldo Bancario',
+      style: TextStyle(
+        fontSize: 18, // Tamaño similar a headline6
+        fontWeight: FontWeight.bold,
+        color: balance >= 0 ? Colors.blue : Colors.red,
+      ),
+    ),
+    Spacer(),
+    IconButton(
+      icon: Icon(Icons.edit, color: Colors.grey),
+      onPressed: onEdit,
+      tooltip: 'Editar saldo',
+    ),
+  ],
+),
+SizedBox(height: 8),
+Text(
+  NumberFormatter.formatCurrency(balance),
+  style: TextStyle(
+    fontSize: 24, // Tamaño similar a headline5
+    fontWeight: FontWeight.bold,
+    color: balance >= 0 ? Colors.blue : Colors.red,
+  ),
+),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _showEditDialog(BuildContext context, double currentBalance) async {
+    final controller = TextEditingController(
+      text: currentBalance.toStringAsFixed(2),
+    );
+
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Actualizar Saldo Bancario'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+
+            _buildBudgetField(controller)
+            // TextField(
+            //   controller: controller,
+            //   keyboardType: TextInputType.numberWithOptions(decimal: true),
+            //   decoration: InputDecoration(
+            //     labelText: 'Nuevo saldo',
+            //     prefixText: '\$',
+            //     border: OutlineInputBorder(),
+            //   ),
+            // ),
+
+            ,
+            if (_isLoading)
+              Padding(
+                padding: const EdgeInsets.only(top: 16.0),
+                child: CircularProgressIndicator(),
+              ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text('Cancelar'),
+          ),
+          TextButton(
+            onPressed: _isLoading
+                ? null
+                : () async {
+                    setState(() => _isLoading = true);
+
+                    
+                 final newBalance = double.tryParse(
+  controller.text
+    .replaceAll('\$', '')  // Aplica el mismo formato
+    .replaceAll(',', '')
+    .trim()
+) ?? currentBalance;
+                    try {
+                      await Provider.of<ProyectoProvider>(context, listen: false)
+                          .modificarSaldoBanco(newBalance);
+                      Navigator.of(context).pop(true);
+                    } finally {
+                      setState(() => _isLoading = false);
+                    }
+                  },
+            child: Text('Guardar'),
+          ),
+        ],
+      ),
+    );
+
+    if (result == true) {
+      await _loadData(); // Recargar datos después de actualizar
+    }
+  }
+}
+// class BankAccountSummary extends StatefulWidget {
+//   @override
+//   _BankAccountSummaryState createState() => _BankAccountSummaryState();
+// }
+
+// class _BankAccountSummaryState extends State<BankAccountSummary> {
+//   @override
+//   void initState() {
+//     super.initState();
+//     Future.microtask(() =>
+//         Provider.of<ProyectoProvider>(context, listen: false)
+//             .fetchResumenGeneral());
+//   }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       body: Consumer<ProyectoProvider>(
+//         builder: (context, provider, child) {
+//           final resumen = provider.resumen;
+
+//           if (provider.errorMessage != null) {
+//             return Center(child: Text(provider.errorMessage!));
+//           }
+
+//           if (resumen == null) {
+//             return Center(child: CircularProgressIndicator());
+//           }
+
+//           return Center(
+//             child: Container(
+//               decoration: BoxDecoration(
+//                 borderRadius: BorderRadius.circular(16),
+//               ),
+//               child: Card(
+//                 margin: EdgeInsets.all(16),
+//                 elevation: 6,
+//                 shape: RoundedRectangleBorder(
+//                     borderRadius: BorderRadius.circular(16)),
+//                 child: Padding(
+//                   padding: const EdgeInsets.all(10.0),
+//                   child: Column(
+//                     mainAxisSize: MainAxisSize.min,
+//                     children: [
+//                       Row(
+//                         children: [
+//                           Flexible(
+//                             flex: 3,
+//                             child: Text(
+//                               'Resumen Financiero',
+//                               style: TextStyle(
+//                                   fontSize: 18, fontWeight: FontWeight.bold),
+//                             ),
+//                           ),
+//                           Flexible(
+//                             flex: 1,
+//                             child: IconButton(
+//                               icon: Icon(Icons.edit, color: Colors.grey),
+//                               onPressed: () => _showEditDialog(context, resumen.saldo),
+//                             ),
+//                           ),
+//                         ],
+//                       ),
+//                       Divider(thickness: 1, color: Colors.grey.shade400),
+//                       _buildRow("Total Ingresos:", resumen.ingresos, Colors.green),
+//                       _buildRow("Total Salidas:", resumen.egresos, Colors.red),
+//                       Divider(thickness: 1, color: Colors.grey.shade400),
+//                       _buildRow("Saldo Total:", resumen.saldo,
+//                           resumen.saldo >= 0 ? Colors.blue : Colors.red,
+//                           fontWeight: FontWeight.bold),
+                   
+//                     ],
+//                   ),
+//                 ),
+//               ),
+//             ),
+//           );
+//         },
+//       ),
+//     );
+//   }
+
+// void _showEditDialog(BuildContext context, double currentSaldo) {
+//   TextEditingController controller =
+//       TextEditingController(text: currentSaldo.toStringAsFixed(2));
+
+//   showDialog(
+//     context: context,
+//     builder: (context) => AlertDialog(
+//       title: Text('Editar Saldo Total'),
+//       content: TextField(
+//         controller: controller,
+//         keyboardType: TextInputType.numberWithOptions(decimal: true),
+//         decoration: InputDecoration(labelText: 'Nuevo Saldo Total'),
+//       ),
+//       actions: [
+//         TextButton(
+//           onPressed: () => Navigator.of(context).pop(),
+//           child: Text('Cancelar'),
+//         ),
+//         TextButton(
+//           onPressed: () async {
+//             double? nuevoSaldo =
+//                 double.tryParse(controller.text.replaceAll(',', '.'));
+//             if (nuevoSaldo != null) {
+//               try {
+//                 await Provider.of<ProyectoProvider>(context, listen: false)
+//                     .modificarSaldoBanco(nuevoSaldo);
+
+//                 await Provider.of<ProyectoProvider>(context, listen: false)
+//                     .fetchResumenGeneral();  // Recarga datos después de actualizar
+
+//                 Navigator.of(context).pop();
+//               } catch (e) {
+//                 // Opcional: manejar error (mostrar diálogo o snackbar)
+//                 Navigator.of(context).pop();
+//               }
+//             }
+//           },
+//           child: Text('Guardar'),
+//         ),
+//       ],
+//     ),
+//   );
+// }
+
+//   Widget _buildRow(String label, double value, Color color,
+//       {FontWeight fontWeight = FontWeight.normal}) {
+//     return Padding(
+//       padding: const EdgeInsets.symmetric(vertical: 4.0),
+//       child: Row(
+//         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//         children: [
+//           Text(
+//             label,
+//             style: TextStyle(fontSize: 16),
+//           ),
+//           Text(
+//             '\$${value.toStringAsFixed(2)}',
+//             style:
+//                 TextStyle(fontSize: 16, fontWeight: fontWeight, color: color),
+//           ),
+//         ],
+//       ),
+//     );
+//   }
+// }
 
 
 class HomePage2 extends StatefulWidget {
@@ -730,7 +1102,7 @@ class _HomePage2State extends State<HomePage2> {
       child: Row(
         children: [
 
-Flexible(flex:3,child: Container(height: double.infinity,width: double.infinity,color: Colors.white12,child: ProyectoTable(),)),
+//Flexible(flex:3,child: Container(height: double.infinity,width: double.infinity,color: Colors.white12,child: ProyectoTable(),)),
 //card rojo mejorar
      Flexible(
    flex:5,
@@ -1039,6 +1411,11 @@ class _ConstructionProjectsChartState extends State<ConstructionProjectsChart> {
   void initState() {
     super.initState();
     _tooltipBehavior = TooltipBehavior(enable: true);
+ Future.microtask(() {
+  final provider = Provider.of<ProyectoProvider>(context, listen: false);
+  provider.fetchProjectDataBarChart();
+  provider.fetchPieChartData();
+});
 
     // Datos de los proyectos de construcción
     projectData = [
@@ -1057,6 +1434,14 @@ class _ConstructionProjectsChartState extends State<ConstructionProjectsChart> {
     ];
   }
 
+  void _loadProjects() async {
+    final provider = Provider.of<ProyectoProvider>(context, listen: false);
+    await provider.fetchProjectDataBarChart();
+    
+  }
+
+
+
   double getTotal(String field) {
     return projectData.fold(
       0.0,
@@ -1067,7 +1452,7 @@ class _ConstructionProjectsChartState extends State<ConstructionProjectsChart> {
               : item.profit),
     );
   }
-
+        
   @override
   Widget build(BuildContext context) {
     // Calcular los totales para la gráfica de pastel
@@ -1080,176 +1465,190 @@ class _ConstructionProjectsChartState extends State<ConstructionProjectsChart> {
         padding: const EdgeInsets.all(16.0),
         child: Row(
           children: [
-            Flexible(
-              flex: 5,
-              child: SfCartesianChart(
-                tooltipBehavior: _tooltipBehavior,
-                primaryXAxis: CategoryAxis(
-                  title: AxisTitle(text: 'Meses'),
-                ),
-                primaryYAxis: NumericAxis(
-                  title: AxisTitle(text: 'Montos en miles de USD'),
-                  minimum: 0,
-                  maximum: 400,
-                  interval: 50,
-                ),
-                legend: Legend(isVisible: true),
-                series: <CartesianSeries<dynamic, dynamic>>[
-                  LineSeries<_ProjectData, String>(
-                    dataSource: projectData,
-                    xValueMapper: (data, _) => data.projectName,
-                    yValueMapper: (data, _) => data.totalPrice,
-                    name: 'Totales',
-                    color: Colors.yellow,
-                  ),
-                  LineSeries<_ProjectData, String>(
-                    dataSource: projectData,
-                    xValueMapper: (data, _) => data.projectName,
-                    yValueMapper: (data, _) => data.projectCost,
-                    name: 'Costos',
-                    color: Colors.red,
-                  ),
-                  LineSeries<_ProjectData, String>(
-                    dataSource: projectData,
-                    xValueMapper: (data, _) => data.projectName,
-                    yValueMapper: (data, _) => data.profit,
-                    name: 'Ganancias',
-                    color: Colors.green,
-                  ),
-                ],
-              ),
-            ),
-    
+Flexible(
+  flex: 5,
+  child: Consumer<ProyectoProvider>(
+    builder: (context, provider, child) {
+      final data = provider.projectData;
+
+      return SfCartesianChart(
+        tooltipBehavior: TooltipBehavior(enable: true),
+        primaryXAxis: CategoryAxis(title: AxisTitle(text: 'Meses')),
+        primaryYAxis: NumericAxis(
+          title: AxisTitle(text: 'Montos en USD'),
+        ),
+        legend: Legend(isVisible: true),
+        series: <CartesianSeries>[
+          ColumnSeries<ProjectData, String>(
+            dataSource: data,
+            xValueMapper: (data, _) => data.projectName,
+            yValueMapper: (data, _) => data.totalPrice,
+            name: 'Totales',
+            color: Colors.yellow,
+          ),
+          ColumnSeries<ProjectData, String>(
+            dataSource: data,
+            xValueMapper: (data, _) => data.projectName,
+            yValueMapper: (data, _) => data.projectCost,
+            name: 'Costos',
+            color: Colors.red,
+          ),
+          ColumnSeries<ProjectData, String>(
+            dataSource: data,
+            xValueMapper: (data, _) => data.projectName,
+            yValueMapper: (data, _) => data.profit,
+            name: 'Ganancias',
+            color: Colors.green,
+          ),
+        ],
+      );
+    },
+  ),
+),
+
             // Gráfica de pastel
-            Flexible(
-              flex: 3,
-              child: SfCircularChart(
-                title: ChartTitle(text: 'Distribución Total'),
-                legend: Legend(
-                  isVisible: true,
-                  overflowMode: LegendItemOverflowMode.wrap,
-                ),
-                series: <CircularSeries>[
-                  PieSeries<_PieData, String>(
-                    dataSource: [
-                      _PieData('Totales', total, Colors.yellow),
-                      _PieData('Costos', cost, Colors.red),
-                      _PieData('Ganancias', profit, Colors.green),
-                    ],
-                    xValueMapper: (data, _) => data.label,
-                    yValueMapper: (data, _) => data.value,
-                    pointColorMapper: (data, _) => data.color,
-                    dataLabelSettings: DataLabelSettings(isVisible: true),
-                  ),
-                ],
+Flexible(
+  flex: 3,
+  child: Consumer<ProyectoProvider>(
+    builder: (context, proyectoProvider, child) {
+      final pieData = proyectoProvider.pieChartData;
+
+      if (pieData == null) {
+        // Mientras carga o no hay datos
+        return Center(child: CircularProgressIndicator());
+      }
+
+      return SfCircularChart(
+        title: ChartTitle(text: 'Distribución Total'),
+        legend: Legend(
+          isVisible: true,
+          overflowMode: LegendItemOverflowMode.wrap,
+        ),
+        series: <CircularSeries>[
+          PieSeries<_PieData, String>(
+            dataSource: [
+              _PieData('Adelantos', pieData.total, Colors.yellow),
+              _PieData('Costos', pieData.cost, Colors.red),
+              _PieData('Ganancias', pieData.profit, Colors.green),
+            ],
+            xValueMapper: (data, _) => data.label,
+            yValueMapper: (data, _) => data.value,
+            pointColorMapper: (data, _) => data.color,
+            dataLabelSettings: DataLabelSettings(isVisible: true),
+          ),
+        ],
+      );
+    },
+  ),
+),
+
+      Flexible(
+  flex: 3,
+  child: Consumer<ProyectoProvider>(
+    builder: (context, proyectoProvider, child) {
+      final pieData = proyectoProvider.pieChartData;
+
+      if (pieData == null) {
+        return Center(child: CircularProgressIndicator());
+      }
+
+      // Calcular porcentaje de ganancia: (profit / total) * 100
+      final porcentajeGanancia = pieData.total != 0
+          ? (pieData.profit / pieData.total) * 100
+          : 0.0;
+
+      // Datos a mostrar en el Grid
+   final List<Map<String, dynamic>> items = [
+  {
+    'icon': Icons.money,
+    'value': '\$${NumberFormatter.format(pieData.total)}',
+    'label': 'Total Monto del Mes',
+    'cardColor': Colors.green.shade100,
+    'iconColor': Colors.green,
+    'textColor': Colors.black,
+  },
+  {
+    'icon': Icons.attach_money,
+    'value': '${NumberFormatter.format(porcentajeGanancia, decimalPlaces: 2)}%',
+    'label': 'Porcentaje de Ganancia',
+    'cardColor': Colors.orange.shade100,
+    'iconColor': Colors.orange,
+    'textColor': Colors.black,
+  },
+  {
+    'icon': Icons.bar_chart,
+    'value': '\$${NumberFormatter.format(pieData.cost)}',
+    'label': 'Total de Costos',
+    'cardColor': Colors.blue.shade100,
+    'iconColor': Colors.blue,
+    'textColor': Colors.black,
+  },
+  {
+    'icon': Icons.account_balance_wallet,
+    'value': '\$${NumberFormatter.format(pieData.profit)}',
+    'label': 'Ganancia en Dinero',
+    'cardColor': Colors.purple.shade100,
+    'iconColor': Colors.purple,
+    'textColor': Colors.black,
+  },
+];
+
+ return Container(
+  padding: EdgeInsets.all(2),
+  child: GridView.builder(
+    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+      crossAxisCount: 2,        // 2 por fila
+      crossAxisSpacing: 4,      // Espaciado horizontal
+      mainAxisSpacing: 1,       // Espaciado vertical
+      childAspectRatio: 1.9,      // Cuadrado perfecto
+    ),
+    itemCount: items.length,
+    itemBuilder: (context, index) {
+      final item = items[index];
+
+      return Card(
+        color: item['cardColor'],
+        elevation: 2,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(1.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                item['icon'],
+                size: 24,
+                color: item['iconColor'],
               ),
-            ),
-
-            // Cards
-            Flexible(
-              flex: 3,
-              child: Container(
-                height: double.infinity,
-                width: double.infinity,
-                padding: EdgeInsets.all(8),
-                child: GridView.builder(
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 8,
-                    mainAxisSpacing: 2,
-                    childAspectRatio: 1.6,
-                  ),
-                  itemCount: 4,
-                  itemBuilder: (context, index) {
-                    Color cardColor;
-                    Color iconColor;
-                    Color textColor;
-
-                    switch (index) {
-                      case 0:
-                        cardColor = Colors.green.shade100;
-                        iconColor = Colors.green;
-                        textColor = Colors.black;
-                        break;
-                      case 1:
-                        cardColor = Colors.orange.shade100;
-                        iconColor = Colors.orange;
-                        textColor = Colors.black;
-                        break;
-                      case 2:
-                        cardColor = Colors.blue.shade100;
-                        iconColor = Colors.blue;
-                        textColor = Colors.black;
-                        break;
-                      case 3:
-                        cardColor = Colors.purple.shade100;
-                        iconColor = Colors.purple;
-                        textColor = Colors.black;
-                        break;
-                      default:
-                        cardColor = Colors.white;
-                        iconColor = Colors.black;
-                        textColor = Colors.black;
-                    }
-
-                    return Card(
-                      color: cardColor,
-                      elevation: 4,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(6.0),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Icon(
-                              index == 0
-                                  ? Icons.money
-                                  : index == 1
-                                      ? Icons.attach_money
-                                      : index == 2
-                                          ? Icons.bar_chart
-                                          : Icons.account_balance_wallet,
-                              size: 28,
-                              color: iconColor,
-                            ),
-                            SizedBox(height: 6),
-                            Text(
-                              index == 0
-                                  ? '\$5000'
-                                  : index == 1
-                                      ? '25%'
-                                      : index == 2
-                                          ? '\$3000'
-                                          : '\$2000',
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold,
-                                color: textColor,
-                              ),
-                            ),
-                            SizedBox(height: 4),
-                            Text(
-                              index == 0
-                                  ? 'Total Monto del Mes'
-                                  : index == 1
-                                      ? 'Porcentaje de Ganancia'
-                                      : index == 2
-                                          ? 'Total de Costos'
-                                          : 'Ganancia en Dinero',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(fontSize: 10, color: textColor),
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
-                  },
+              SizedBox(height: 4),
+              Text(
+                item['value'],
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                  color: item['textColor'],
                 ),
               ),
-            ),
+              SizedBox(height: 2),
+              Text(
+                item['label'],
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 9, color: item['textColor']),
+              ),
+            ],
+          ),
+        ),
+      );
+    },
+  ),
+);
+
+    },
+  ),
+),
+
           ],
         ),
       ),

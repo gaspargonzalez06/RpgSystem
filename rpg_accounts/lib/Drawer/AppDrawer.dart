@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:rpg_accounts/Provider/ProyectosProvider.dart';
 import 'package:rpg_accounts/Views/Materiales.dart';
 import 'package:rpg_accounts/Views/Personal/PaginaPersonal.dart';
 import 'package:rpg_accounts/main.dart';
 
-
 class AppDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final usuario = Provider.of<ProyectoProvider>(context).usuarioLogueado;
+
     return Drawer(
       backgroundColor: Colors.white,
       child: ListView(
@@ -24,6 +27,16 @@ class AppDrawer extends StatelessWidget {
                   'Bienvenido',
                   style: TextStyle(color: Colors.white, fontSize: 18),
                 ),
+                SizedBox(height: 5),
+                if (usuario != null)
+                  Text(
+                    usuario.nombreUsuario,  // o el campo que quieras mostrar
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
               ],
             ),
           ),
@@ -39,31 +52,29 @@ class AppDrawer extends StatelessWidget {
             text: 'Proyectos',
             page: ProyectosPage(),
           ),
+          // _buildDrawerItem(
+          //   context: context,
+          //   icon: Icons.inventory,
+          //   text: 'Materiales',
+          //   page: MaterialesPage(),
+          // ),
           _buildDrawerItem(
             context: context,
-            icon: Icons.inventory,
-            text: 'Materiales',
-            page: MaterialesPage(),
+            icon: Icons.person,
+            text: 'Gestión de Usuarios',
+            page: AgregarPersonalManoDeObra(),
           ),
-          _buildDrawerItem(
-  context: context,
-  icon: Icons.person,
-  text: 'Personal de Mano de Obra',
-  page: AgregarPersonalManoDeObra(),
-),
-
-          _buildDrawerItem(
-            context: context,
-            icon: Icons.settings,
-            text: 'Gestión',
-            page: GestionPage(),
-          ),
+          // _buildDrawerItem(
+          //   context: context,
+          //   icon: Icons.settings,
+          //   text: 'Gestión',
+          //   page: GestionPage(),
+          // ),
         ],
       ),
     );
   }
 
-  /// Método para crear un ListTile que navegue a la página especificada
   Widget _buildDrawerItem({
     required BuildContext context,
     required IconData icon,
@@ -74,7 +85,7 @@ class AppDrawer extends StatelessWidget {
       leading: Icon(icon),
       title: Text(text),
       onTap: () {
-        Navigator.pop(context); // Cierra el Drawer antes de navegar
+        Navigator.pop(context);
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => page),
